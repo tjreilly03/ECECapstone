@@ -17,6 +17,7 @@
 
 
 HARD_CLIP_T *init_hard_clip(
+	float distortionLevel
     	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
@@ -25,6 +26,7 @@ HARD_CLIP_T *init_hard_clip(
   HARD_CLIP_T *s;
   //initialize the filter structure
   s = (HARD_CLIP_T *)malloc( sizeof(HARD_CLIP_T) );
+  s->distortionLevel = distortionLevel;
   return(s);
 }
 
@@ -32,6 +34,13 @@ HARD_CLIP_T *init_hard_clip(
 void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
 {
   //Whatever calc is needed to create the hard clipping func
+  //Find max of the outputs, use that to find the maximum amplitude based off of the distortion level
+  
+}
+
+void update_distortion_hard_clip( HARD_CLIP_T *s, float *new_distortion)
+{
+  s->distortionLevel = new_distortion;
 }
 
 

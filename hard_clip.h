@@ -48,6 +48,7 @@ typedef struct your_hard_clip_struct {
  * be used to calculate the requested filter outputs.
  */
 HARD_CLIP_T *init_hard_clip(
+	float distortionLevel;
 	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
@@ -62,6 +63,12 @@ void calc_hard_clip(
 		        //!< previous calls to calc_fir() )
   float *x,             //!< [in] pointer to the input sample array
   float *y              //!< [out] Pointer to an array for storage of output samples
+);
+
+
+void update_distortion_hard_clip(
+	HARD_CLIP_T *s,
+	float *new_distortion
 );
 
 /*!

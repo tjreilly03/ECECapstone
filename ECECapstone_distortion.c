@@ -18,7 +18,12 @@ int main(void)
     //Initialize all variables being used
   int nblocksize;
   float *input1, *input2, *output1, *output2;
+
+  float distortionLevel = 0.0f;
  
+  HARD_CLIP_T *hardFilt;
+  SOFT_CLIP_T *softFilt;
+
   // Use setblocksize() to control the sized of the sample arrays
   setblocksize(BLOCKSIZE);
 
@@ -42,6 +47,10 @@ int main(void)
   output1 = (float *)malloc(sizeof(float)*nblocksize);
   output2 = (float *)malloc(sizeof(float)*nblocksize);
 
+  softFilt = init_soft_clip(distortionLevel);
+  hardFilt = init_hard_clip(distortionLevel);
+  
+
   // Infinite Loop to process the sample stream, "nsamp" samples at a time
   while(1){
     
@@ -54,6 +63,13 @@ int main(void)
     //Sudo Code:
     //Get value of distortion level potentiometer
     //Set this to the maximum amplitude for the compression amount
+    //This will have to be some sort of inverse relation ship, because the higher the value, the lower the max amplitude is.
+
+    //distortionLevel = getDistortionValue();
+
+    update_distortion_soft_clip(softFilt, distortionLevel);
+    update_distortion_hard_clip(hardFilt,distortionLevel);
+
 
     //Get value of distortion type switch.
     //If soft, run soft clipping code
