@@ -9,6 +9,7 @@
 #include "stm32l476xx.h"
 #include "arm_math.h"
 #include "soft_clip.h"
+#include "hard_clip.h"
 
 #define BLOCKSIZE 100
 
