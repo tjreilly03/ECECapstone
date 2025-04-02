@@ -51,6 +51,20 @@ int main(void)
     //   to wait for the next block
     getblockstereo(input1,input2);	
 
+    //Sudo Code:
+    //Get value of distortion level potentiometer
+    //Set this to the maximum amplitude for the compression amount
+
+    //Get value of distortion type switch.
+    //If soft, run soft clipping code
+    //If Hard, run hard clipping code
+
+    //Then get value of output amplitude potentiometer
+    //Amplify the final output by this amount.
+    //Send out the final output
+    
+    
+
     PA6_SET();
 
     PA6_RESET();  // (falling edge on PA6: Done processing data )
