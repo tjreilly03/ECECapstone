@@ -36,7 +36,7 @@ void calc_soft_clip( SOFT_CLIP_T *s, float *x_in, float *y_out)
   //Whatever calc is needed to create the soft clipping func
 }
 
-void update_distortion_soft_clip( SOFT_CLIP_T *s, float *new_distortion)
+void update_distortion_soft_clip( SOFT_CLIP_T *s, float new_distortion)
 {
   s->distortionLevel = new_distortion;
 }

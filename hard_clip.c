@@ -38,7 +38,7 @@ void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
   
 }
 
-void update_distortion_hard_clip( HARD_CLIP_T *s, float *new_distortion)
+void update_distortion_hard_clip( HARD_CLIP_T *s, float new_distortion)
 {
   s->distortionLevel = new_distortion;
 }
