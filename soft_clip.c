@@ -23,6 +23,7 @@ SOFT_CLIP_T *init_soft_clip(
 )
 {
   SOFT_CLIP_T *s;
+  //initialize the filter structure
   s = (SOFT_CLIP_T *)malloc( sizeof(SOFT_CLIP_T) );
   return(s);
 }
