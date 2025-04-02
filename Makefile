@@ -1,6 +1,6 @@
-TARGET=ece486_example
+TARGET=ECECapstone_distortion
 
-OBJS  = ece486_example.o 
+OBJS  = ECECapstone_distortion.o soft_clip.o
 
 
 INSTALLDIR = /usr/local/stmdev/
