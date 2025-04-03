@@ -1,22 +1,39 @@
 /*!
- * @file soft_clip.h
+ * @file get_values.h
  * 
- * @brief This will hold the function defs for the soft clipping portion of the pedal.
+ * @brief This will hold the function defs for getting the switch and potnetiometer values
  * 
  * @author Tyler Reilly
  * 
  * @date April 2025
- * 
- * @defgroup Function Interface Requirements for Soft Clip Filters
- *   @{
- * 
- * 
-      }@
+
  */
 
 
 #ifndef GET_VALUES
 #define GET_VALUES
 
+
+float get_dial_value(
+	//Needs some variable for what poteniometer pin to use
+	int pin_number
+);
+
+
+float get_switch_value(
+	//Needs some variable for what switch pin to use
+	int pin_number
+);
+
+void set_led_on_value(
+	//Needs some variable for what led pin to use
+	int pin_number
+);
+
+
+void set_led_off_value(
+	//Needs some variable for what led pin to use
+	int pin_number
+);
 
 #endif

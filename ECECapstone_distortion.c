@@ -10,6 +10,8 @@
 #include "arm_math.h"
 #include "soft_clip.h"
 #include "hard_clip.h"
+#include "get_values.h"
+
 
 #define BLOCKSIZE 100
 
@@ -20,6 +22,13 @@ int main(void)
   float *input1, *input2, *output1, *output2;
 
   float distortionLevel = 0.0f;
+  float volumeLevel = 1.0f;
+
+  float inversedDistortionLevel = 0.0f;
+
+  float bypassSwitchValue , distortionTypeValue;
+
+  int bypassSwitchPin, distortionTypeSwitchPin, distortionLevelPotentiometerPin, volumeLevelPotentiometerPin;
  
   HARD_CLIP_T *hardFilt;
   SOFT_CLIP_T *softFilt;
@@ -47,46 +56,78 @@ int main(void)
   output1 = (float *)malloc(sizeof(float)*nblocksize);
   output2 = (float *)malloc(sizeof(float)*nblocksize);
 
-  softFilt = init_soft_clip(distortionLevel);
-  hardFilt = init_hard_clip(distortionLevel);
+  softFilt = init_soft_clip(distortionLevel, volumeLevel);
+  hardFilt = init_hard_clip(distortionLevel, volumeLevel);
   
+  //Whatever pins I end up using here
+  bypassSwitchPin = 16;
+  distortionTypeSwitchPin = 17;
+  distortionLevelPotentiometerPin = 18;
+  volumeLevelPotentiometerPin = 19;
 
   // Infinite Loop to process the sample stream, "nsamp" samples at a time
   while(1){
     
+
     // Ask for a block of ADC samples to be put into the sample buffer:
     //   getblockstereo() will wait here until the input buffer is filled.
     //   On return, we work on the new data buffer... then come back here 
     //   to wait for the next block
     getblockstereo(input1,input2);	
-
-    //Sudo Code:
-    //Get value of distortion level potentiometer
-    //Set this to the maximum amplitude for the compression amount
-    //This will have to be some sort of inverse relation ship, because the higher the value, the lower the max amplitude is.
-
-    //distortionLevel = getDistortionValue();
-
-    update_distortion_soft_clip(softFilt, distortionLevel);
-    update_distortion_hard_clip(hardFilt,distortionLevel);
+    PA6_SET(); //Start of processing time
 
 
-    //Get value of distortion type switch.
-    //If soft, run soft clipping code
-    //If Hard, run hard clipping code
+    //Determine whether the footswitch is on or off
+    //This will determine whether or not to just pass the input to the output or to do the crunching
+    bypassSwitchValue = get_switch_value(bypassSwitchPin);
+    //If the switch is pressed, ie the voltage is high
+    if(bypassSwitchValue > 1.65){
+        //Pedal is in the on position
+        
+        //Get value of distortion level potentiometer
+        distortionLevel = get_dial_value(distortionLevelPotentiometerPin);
 
-    //Then get value of output amplitude potentiometer
-    //Amplify the final output by this amount.
-    //Send out the final output
+         //Set this to the maximum amplitude for the compression amount
+        //This will have to be some sort of inverse relation ship, because the higher the value, the lower the max amplitude is.
+        inversedDistortionLevel = 1/distortionLevel;
+
+        //Get value of distortion type switch.
+        distortionTypeValue = get_switch_value(distortionTypeSwitchPin);
+        
+        //Then get value of output amplitude potentiometer
+        //Amplify the final output by this amount.
+        volumeLevel = get_dial_value(volumeLevelPotentiometerPin);
+
+        if(distortionTypeValue > 1.65){
+            //If soft, run soft clipping code
+            //Also logic to light up led at pin whatever to indicate soft clipping
+            update_distortion_soft_clip(softFilt, inversedDistortionLevel);
+            update_volume_soft_clip(softFilt, volumeLevel);
+            calc_soft_clip( softFilt, input1, output1);
+        
+        }
+        else{
+            //If Hard, run hard clipping code
+            //Also logic to light up led at pin whatever to indicate hard clipping
+            update_distortion_hard_clip(hardFilt,inversedDistortionLevel);
+            update_volume_hard_clip(hardFilt, volumeLevel);
+            calc_hard_clip( hardFilt, input1, output1);
+
+        }
+
+        
+        //Send out the final output
+
+        PA6_RESET();  // (falling edge on PA6: Done processing data )
     
-    
+        //Stage the output arrays back to the DAC to streem the output
+        putblockstereo(output1, output2);
+    }
+    else{
+        //Pedal is in the off position
+        putblockstereo(input1, input2);
+    }
 
-    PA6_SET();
-
-    PA6_RESET();  // (falling edge on PA6: Done processing data )
-    
-    //Stage the output arrays back to the DAC to streem the output
-    putblockstereo(output1, output2);
     
   }  /// end of while(1)... time to go wait for the next block of input samples...
 }

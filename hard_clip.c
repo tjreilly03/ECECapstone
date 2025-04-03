@@ -17,7 +17,8 @@
 
 
 HARD_CLIP_T *init_hard_clip(
-	float distortionLevel
+	float distortionLevel,
+	float volumeLevel
     	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
@@ -27,6 +28,7 @@ HARD_CLIP_T *init_hard_clip(
   //initialize the filter structure
   s = (HARD_CLIP_T *)malloc( sizeof(HARD_CLIP_T) );
   s->distortionLevel = distortionLevel;
+  s->volumeLevel = volumeLevel;
   return(s);
 }
 
@@ -43,6 +45,10 @@ void update_distortion_hard_clip( HARD_CLIP_T *s, float new_distortion)
   s->distortionLevel = new_distortion;
 }
 
+void update_volume_hard_clip( HARD_CLIP_T *s, float new_volume)
+{
+  s->volumeLevel = new_volume;
+}
 
 void destroy_hard_clip(HARD_CLIP_T *s)
 {

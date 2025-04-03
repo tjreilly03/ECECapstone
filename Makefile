@@ -1,6 +1,6 @@
 TARGET=ECECapstone_distortion
  
-OBJS  = ECECapstone_distortion.o soft_clip.o hard_clip.o
+OBJS  = ECECapstone_distortion.o soft_clip.o hard_clip.o get_values.o
 
 
 INSTALLDIR = /usr/local/stmdev/

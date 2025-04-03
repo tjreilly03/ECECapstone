@@ -17,7 +17,8 @@
 
 
 SOFT_CLIP_T *init_soft_clip(
-	float distortionLevel
+	float distortionLevel,
+	float volumeLevel
     	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
@@ -27,6 +28,7 @@ SOFT_CLIP_T *init_soft_clip(
   //initialize the filter structure
   s = (SOFT_CLIP_T *)malloc( sizeof(SOFT_CLIP_T) );
   s->distortionLevel = distortionLevel;
+  s->volumeLevel = volumeLevel;
   return(s);
 }
 
@@ -34,6 +36,7 @@ SOFT_CLIP_T *init_soft_clip(
 void calc_soft_clip( SOFT_CLIP_T *s, float *x_in, float *y_out)
 {
   //Whatever calc is needed to create the soft clipping func
+  //Do some sort of calculation here.
 }
 
 void update_distortion_soft_clip( SOFT_CLIP_T *s, float new_distortion)
@@ -41,6 +44,10 @@ void update_distortion_soft_clip( SOFT_CLIP_T *s, float new_distortion)
   s->distortionLevel = new_distortion;
 }
 
+void update_volume_soft_clip( SOFT_CLIP_T *s, float new_volume)
+{
+  s->volumeLevel = new_volume;
+}
 
 void destroy_soft_clip(SOFT_CLIP_T *s)
 {
