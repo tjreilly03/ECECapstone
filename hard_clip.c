@@ -37,6 +37,8 @@ void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
 {
   //Whatever calc is needed to create the hard clipping func
   //Find max of the outputs, use that to find the maximum amplitude based off of the distortion level
+
+  //Do some calculation based off of the s->distortionLevel and s->volumeLevel
   
 }
 
