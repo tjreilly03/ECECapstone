@@ -39,7 +39,8 @@ void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
   //Find max of the outputs, use that to find the maximum amplitude based off of the distortion level
 
   //Do some calculation based off of the s->distortionLevel and s->volumeLevel
-  
+    //Basically it will be like, get the value, find the difference from the limit set by the s->distortionLevel,
+  //and if it x[n] is greater than that value, just set it to that value. This will create the hard clipped output.
 }
 
 void update_distortion_hard_clip( HARD_CLIP_T *s, float new_distortion)

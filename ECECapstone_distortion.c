@@ -1,5 +1,7 @@
 /*
- Lab 3 Code for Nucleo Board
+Tyler Reilly
+ECE Capstone
+Distortion Pedal
  */
 
 #include "ece486.h"
@@ -42,6 +44,7 @@ int main(void)
   //  should always work, but is lower quality. Use the 
   //  external 8MHz option if your board is jumpered to support it.
   //initialize_ece486(FS_50K, HSI_INTERNAL_RC);
+  //Initialize sampling rate of 50k to meet spec. 
   initialize_ece486(FS_50K, HSE_EXTERNAL_8MHz);
 
   //initialize_ece486(FS_200K, HSE_EXTERNAL_8MHz);
@@ -51,6 +54,7 @@ int main(void)
   //  other arrays are typically allocated to support the DSP algorithms
   nblocksize = getblocksize(); // Query the sample block size being used
 	
+  //These are 32 bit floats, single precision, meaning they have 24 bit resolution, meeting spec.
   input1 = (float *)malloc(sizeof(float)*nblocksize);
   input2 = (float *)malloc(sizeof(float)*nblocksize);
   output1 = (float *)malloc(sizeof(float)*nblocksize);
@@ -104,7 +108,8 @@ int main(void)
             update_distortion_soft_clip(softFilt, inversedDistortionLevel);
             update_volume_soft_clip(softFilt, volumeLevel);
             calc_soft_clip( softFilt, input1, output1);
-        
+            //I guess if it's stereo,
+            //calc_soft_clip( softFilt, input2, output2);
         }
         else{
             //If Hard, run hard clipping code
@@ -112,9 +117,11 @@ int main(void)
             update_distortion_hard_clip(hardFilt,inversedDistortionLevel);
             update_volume_hard_clip(hardFilt, volumeLevel);
             calc_hard_clip( hardFilt, input1, output1);
-
+            //I guess if it's stereo,
+            //calc_hard_clip( hardFilt, input2, output2);
         }
-
+        //then have to do some sort of overall amplitude based on s->volumeLevel to the outputs, either way. This saves some lines of code in each calc function.
+        //Why define the same thing twice when you can just define it once.
         
         //Send out the final output
 

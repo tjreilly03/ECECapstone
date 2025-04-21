@@ -37,6 +37,8 @@ void calc_soft_clip( SOFT_CLIP_T *s, float *x_in, float *y_out)
 {
   //Whatever calc is needed to create the soft clipping func
   //Do some sort of calculation here.
+  //Basically it will be like, get the value, find the difference from the limit set by the s->distortionLevel,
+  //and then multiply by some fraction, like 1/8 or 1/4 to make the peak lower, but still a nice soft wave, not hard clipped.
 }
 
 void update_distortion_soft_clip( SOFT_CLIP_T *s, float new_distortion)
