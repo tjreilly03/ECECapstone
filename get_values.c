@@ -23,7 +23,7 @@ float get_dial_value(
 )
 {
 	//Get voltage value at pin pin_number
-
+	//Use adc to get value.
   float value = 0.0f; //some function to get voltage from poteniometer
   return(value);
 }
@@ -35,7 +35,7 @@ float get_switch_value(
 )
 {
 	//Get voltage value for that switch at pin pin_number
-
+	//Use gpio pin
   float value = 0.0f; //some function to get voltage from poteniometer
   return(value);
 }
@@ -46,6 +46,7 @@ void set_led_on_value(
 ){
 
 //Set the desired led on
+//Use gpio pin to turn voltage high to 3.3v
 }
 
 void set_led_off_value(
@@ -54,5 +55,6 @@ void set_led_off_value(
 ){
 
 //Set the desired led off
+//Use gpio pin to turn voltage low to gnd
 }
 
