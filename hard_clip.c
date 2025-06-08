@@ -18,7 +18,8 @@
 
 HARD_CLIP_T *init_hard_clip(
 	float distortionLevel,
-	float volumeLevel
+	float volumeLevel,
+	int blocksize
     	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
@@ -29,6 +30,7 @@ HARD_CLIP_T *init_hard_clip(
   s = (HARD_CLIP_T *)malloc( sizeof(HARD_CLIP_T) );
   s->distortionLevel = distortionLevel;
   s->volumeLevel = volumeLevel;
+  s->blocksize = blocksize;
   return(s);
 }
 
@@ -41,6 +43,18 @@ void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
   //Do some calculation based off of the s->distortionLevel and s->volumeLevel
     //Basically it will be like, get the value, find the difference from the limit set by the s->distortionLevel,
   //and if it x[n] is greater than that value, just set it to that value. This will create the hard clipped output.
+
+    for(int i=0; i<s->blocksize; i++){
+		if(x_in[i] > s->distortionLevel){
+			y_out[i] = s->distortionLevel;
+		}
+		else if(x_in[i]< (s->distortionLevel) * -1){
+			y_out[i] = (s->distortionLevel) * -1;
+		}
+		else{
+			y_out[i] = x_in[i];
+		}
+	}
 }
 
 void update_distortion_hard_clip( HARD_CLIP_T *s, float new_distortion)

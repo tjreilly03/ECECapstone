@@ -30,6 +30,7 @@
 typedef struct your_hard_clip_struct {
 		float distortionLevel;
 		float volumeLevel;
+		int blocksize;
 		//Some variables here
 		//Some variables here
 
@@ -50,7 +51,8 @@ typedef struct your_hard_clip_struct {
  */
 HARD_CLIP_T *init_hard_clip(
 	float distortionLevel,
-	float volumeLevel
+	float volumeLevel,
+	int blocksize
 	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
