@@ -1,0 +1,4 @@
+############## To build and install the libraries, you'll need the gcc tool-chain
+############## for your installation.  Then (from the build directory)
+  make -j
+  sudo make install
