@@ -64,7 +64,7 @@ int main(void)
 
   output1 = (float *)malloc(sizeof(float)*nblocksize);
 
-  softFilt = init_soft_clip(distortionLevel, volumeLevel);
+  softFilt = init_soft_clip(distortionLevel, volumeLevel, AUDIO_BLOCKSIZE);
   hardFilt = init_hard_clip(distortionLevel, volumeLevel, AUDIO_BLOCKSIZE);
   
 
@@ -97,6 +97,15 @@ int main(void)
 
         // Map to output range
         inversedDistortionLevel = distortionDial[0];
+        if(inversedDistortionLevel < -0.8f){
+            inversedDistortionLevel = -0.8f;
+        }
+        if(inversedDistortionLevel > -.05f){
+            inversedDistortionLevel = -.05f;
+        }
+
+
+        //printf("The value of the inversedDistortionLevel is %3.4f \n\n\n", inversedDistortionLevel);
 
         GPIOC->MODER &= ~(3<<(2*DISTORTION_TYPE_PIN)); // Input (00)
 

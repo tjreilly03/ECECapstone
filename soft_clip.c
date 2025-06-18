@@ -18,7 +18,8 @@
 
 SOFT_CLIP_T *init_soft_clip(
 	float distortionLevel,
-	float volumeLevel
+	float volumeLevel,
+	int blocksize
     	//Same variables as struct as input,
 	//Same variables as struct as input,
 	//Same variables as struct as input,
@@ -29,17 +30,30 @@ SOFT_CLIP_T *init_soft_clip(
   s = (SOFT_CLIP_T *)malloc( sizeof(SOFT_CLIP_T) );
   s->distortionLevel = distortionLevel;
   s->volumeLevel = volumeLevel;
+    s->blocksize = blocksize;
+
   return(s);
 }
 
 
-void calc_soft_clip( SOFT_CLIP_T *s, float *x_in, float *y_out)
+void calc_soft_clip(SOFT_CLIP_T *s, float *x_in, float *y_out)
 {
-  //Whatever calc is needed to create the soft clipping func
-  //Do some sort of calculation here.
-  //Basically it will be like, get the value, find the difference from the limit set by the s->distortionLevel,
-  //and then multiply by some fraction, like 1/8 or 1/4 to make the peak lower, but still a nice soft wave, not hard clipped.
+    float limit = s->distortionLevel;
+
+    for (int i = 0; i < s->blocksize; i++) {
+        float x = x_in[i];
+        float abs_limit = fabsf(limit);
+
+        if (x > abs_limit) {
+            y_out[i] = abs_limit;
+        } else if (x < -abs_limit) {
+            y_out[i] = -abs_limit;
+        } else {
+            y_out[i] = x - (x * x * x) / (3.0f * abs_limit * abs_limit);
+        }
+    }
 }
+
 
 void update_distortion_soft_clip( SOFT_CLIP_T *s, float new_distortion)
 {
