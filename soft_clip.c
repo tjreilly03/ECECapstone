@@ -28,7 +28,7 @@ SOFT_CLIP_T *init_soft_clip(
   SOFT_CLIP_T *s;
   //initialize the filter structure
   s = (SOFT_CLIP_T *)malloc( sizeof(SOFT_CLIP_T) );
-  s->distortionLevel = distortionLevel;
+  s->distortionLevel = -distortionLevel;
   s->volumeLevel = volumeLevel;
     s->blocksize = blocksize;
 
@@ -36,22 +36,32 @@ SOFT_CLIP_T *init_soft_clip(
 }
 
 
-void calc_soft_clip(SOFT_CLIP_T *s, float *x_in, float *y_out)
+void calc_soft_clip(SOFT_CLIP_T* s, float* x_in, float* y_out)
 {
-    float limit = s->distortionLevel;
+	//Whatever calc is needed to create the hard clipping func
+	//Find max of the outputs, use that to find the maximum amplitude based off of the distortion level
 
-    for (int i = 0; i < s->blocksize; i++) {
-        float x = x_in[i];
-        float abs_limit = fabsf(limit);
+	//Do some calculation based off of the s->distortionLevel and s->volumeLevel
+	  //Basically it will be like, get the value, find the difference from the limit set by the s->distortionLevel,
+	//and if it x[n] is greater than that value, just set it to that value. This will create the hard clipped output.
+	float limit = s->distortionLevel;
+	float difference = 0.0f;
+	for (int i = 0; i < s->blocksize; i++) {
+		//printf("x_in[%d] = %f.\n Distortion level is %f.\n",i, x_in[i], limit);
+		if (x_in[i] > limit) {
+			//find the difference
+			difference = x_in[i] - limit;
 
-        if (x > abs_limit) {
-            y_out[i] = abs_limit;
-        } else if (x < -abs_limit) {
-            y_out[i] = -abs_limit;
-        } else {
-            y_out[i] = x - (x * x * x) / (3.0f * abs_limit * abs_limit);
-        }
-    }
+			y_out[i] = limit + (difference/8.0f);
+		}
+		else if (x_in[i] < -limit) {
+			difference = x_in[i] + limit;
+			y_out[i] = -limit + (difference / 8.0f);
+		}
+		else {
+			y_out[i] = x_in[i];
+		}
+	}
 }
 
 

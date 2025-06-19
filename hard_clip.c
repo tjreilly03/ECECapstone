@@ -28,11 +28,12 @@ HARD_CLIP_T *init_hard_clip(
   HARD_CLIP_T *s;
   //initialize the filter structure
   s = (HARD_CLIP_T *)malloc( sizeof(HARD_CLIP_T) );
-  s->distortionLevel = distortionLevel;
+  s->distortionLevel = -distortionLevel;
   s->volumeLevel = volumeLevel;
   s->blocksize = blocksize;
   return(s);
 }
+
 
 
 void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
@@ -43,17 +44,19 @@ void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
   //Do some calculation based off of the s->distortionLevel and s->volumeLevel
     //Basically it will be like, get the value, find the difference from the limit set by the s->distortionLevel,
   //and if it x[n] is greater than that value, just set it to that value. This will create the hard clipped output.
-
+	float limit = s->distortionLevel;
     for(int i=0; i<s->blocksize; i++){
-		if(x_in[i] > s->distortionLevel){
-			y_out[i] = s->distortionLevel;
+		//printf("x_in[%d] = %f.\n Distortion level is %f.\n",i, x_in[i], limit);
+		if(x_in[i] > limit){
+			y_out[i] = limit;
 		}
-		else if(x_in[i]< (s->distortionLevel) * -1){
-			y_out[i] = (s->distortionLevel) * -1;
+		else if(x_in[i] < -limit){
+			y_out[i] = -limit;
 		}
-		else{
+		else {
 			y_out[i] = x_in[i];
 		}
+		
 	}
 }
 

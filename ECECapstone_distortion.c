@@ -20,6 +20,14 @@ Distortion Pedal
 #define DISTORTION_TYPE_PIN 2
 #define BYPASS_TYPE_PIN 3
 
+float calc_mean(float* x, int blocksize) {
+    float sum = 0.0f;
+    for (int i = 0; i < blocksize; i++) {
+        sum += x[i];
+    }
+    return sum / (float)blocksize;
+}
+
 int main(void)
 {
     //Initialize all variables being used
@@ -96,14 +104,14 @@ int main(void)
         //This will have to be some sort of inverse relation ship, because the higher the value, the lower the max amplitude is.
 
         // Map to output range
-        inversedDistortionLevel = distortionDial[0];
+        inversedDistortionLevel = calc_mean(distortionDial,AUDIO_BLOCKSIZE);
         if(inversedDistortionLevel < -0.8f){
             inversedDistortionLevel = -0.8f;
         }
         if(inversedDistortionLevel > -.05f){
             inversedDistortionLevel = -.05f;
         }
-
+        inversedDistortionLevel = -inversedDistortionLevel;
 
         //printf("The value of the inversedDistortionLevel is %3.4f \n\n\n", inversedDistortionLevel);
 
@@ -144,7 +152,7 @@ int main(void)
         PA6_RESET();  // (falling edge on PA6: Done processing data )
     
         //Stage the output arrays back to the DAC to streem the output
-        putblockstereo(output1,distortionDial);
+        putblockstereo(output1, distortionDial);
     }
     else{
         putblockstereo(input1, distortionDial);
