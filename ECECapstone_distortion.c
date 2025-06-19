@@ -19,6 +19,10 @@ Distortion Pedal
 #define AUDIO_BLOCKSIZE 100
 #define DISTORTION_TYPE_PIN 2
 #define BYPASS_TYPE_PIN 3
+#define PEDAL_ON_LED_PIN 5
+#define PEDAL_Off_LED_PIN 4
+
+
 
 float calc_mean(float* x, int blocksize) {
     float sum = 0.0f;
@@ -83,11 +87,21 @@ int main(void)
 
     PA6_SET(); //Start of processing time
 
-    RCC->AHB2ENR |=  RCC_AHB2ENR_GPIOCEN; // Set bits of interests to target value
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
 	
 	GPIOC->MODER &= ~(3<<(2*BYPASS_TYPE_PIN)); // Input (00)
 
 	GPIOC->PUPDR &= ~(3<<(2*BYPASS_TYPE_PIN)); //No Pull up no pull down
+
+    // Clear mode bits
+    GPIOA->MODER &= ~((0b11 << (PEDAL_OFF_LED_PIN * 2)) | (0b11 << (PEDAL_ON_LED_PIN * 2)));
+
+    // Set both to output mode
+    GPIOA->MODER |=  (0b01 << (PEDAL_OFF_LED_PIN * 2)) | (0b01 << (PEDAL_ON_LED_PIN * 2));
+
+    // Set push-pull and default speed
+    GPIOA->OTYPER &= ~((1 << PEDAL_OFF_LED_PIN) | (1 << PEDAL_ON_LED_PIN));
+
 
 
     //Determine whether the footswitch is on or off
@@ -95,16 +109,19 @@ int main(void)
     bypassSwitchValue = get_switch_value(BYPASS_TYPE_PIN);
 
     if(bypassSwitchValue > 1.65f){
-        //Pedal is in the on position
-        
-        //Get value of distortion level potentiometer
-        //distortionLevel = get_dial_value(distortionLevelPotentiometerPin, hadc1);
+        //turn on the PA5 led and turn off pa4
+        GPIOA->ODR |= (1 << PEDAL_ON_LED_PIN);
+        GPIOA->ODR |= ~(1 << PEDAL_OFF_LED_PIN);
 
-            //Set this to the maximum amplitude for the compression amount
-        //This will have to be some sort of inverse relation ship, because the higher the value, the lower the max amplitude is.
+        //Pedal is in the on position
+       
+          ip, because the higher the value, the lower the max amplitude is.
 
         // Map to output range
         inversedDistortionLevel = calc_mean(distortionDial,AUDIO_BLOCKSIZE);
+          //Set this to the maximum amplitude for the compression amount
+        //This will have to be some sort of inverse relation sh
+
         if(inversedDistortionLevel < -0.8f){
             inversedDistortionLevel = -0.8f;
         }
@@ -155,6 +172,8 @@ int main(void)
         putblockstereo(output1, distortionDial);
     }
     else{
+        GPIOA->ODR |= ~(1 << PEDAL_ON_LED_PIN);  // Set PA5 high
+        GPIOA->ODR |= (1 << PEDAL_OFF_LED_PIN);  // Set PA4 low
         putblockstereo(input1, distortionDial);
     }
   }  /// end of while(1)... time to go wait for the next block of input samples...
