@@ -19,8 +19,11 @@ Distortion Pedal
 #define AUDIO_BLOCKSIZE 100
 #define DISTORTION_TYPE_PIN 2
 #define BYPASS_TYPE_PIN 3
-#define PEDAL_ON_LED_PIN 5
-#define PEDAL_Off_LED_PIN 4
+#define PEDAL_ON_LED_PIN 10
+#define PEDAL_OFF_LED_PIN 12
+
+#define PEDAL_HARD_DIST_LED_PIN 0
+#define PEDAL_SOFT_DIST_LED_PIN 11
 
 
 
@@ -58,9 +61,9 @@ int main(void)
   //  jumpers on the nucleo board. The internal RC operator
   //  should always work, but is lower quality. Use the 
   //  external 8MHz option if your board is jumpered to support it.
-  //initialize_ece486(FS_50K, HSI_INTERNAL_RC);
+  initialize_ece486(FS_50K, HSI_INTERNAL_RC);
   //Initialize sampling rate of 50k to meet spec. 
-  initialize_ece486(FS_50K, HSE_EXTERNAL_8MHz);
+  //initialize_ece486(FS_50K, HSE_EXTERNAL_8MHz);
 
   //initialize_ece486(FS_200K, HSE_EXTERNAL_8MHz);
   
@@ -94,15 +97,17 @@ int main(void)
 	GPIOC->PUPDR &= ~(3<<(2*BYPASS_TYPE_PIN)); //No Pull up no pull down
 
     // Clear mode bits
-    GPIOA->MODER &= ~((0b11 << (PEDAL_OFF_LED_PIN * 2)) | (0b11 << (PEDAL_ON_LED_PIN * 2)));
+    GPIOC->MODER &= ~(0b11 << (PEDAL_OFF_LED_PIN * 2));
+    GPIOC->MODER &= ~(0b11 << (PEDAL_ON_LED_PIN * 2));
+
+    GPIOC->MODER &= ~(0b11 << (PEDAL_HARD_DIST_LED_PIN * 2));
+    GPIOC->MODER &= ~(0b11 << (PEDAL_SOFT_DIST_LED_PIN * 2));
 
     // Set both to output mode
-    GPIOA->MODER |=  (0b01 << (PEDAL_OFF_LED_PIN * 2)) | (0b01 << (PEDAL_ON_LED_PIN * 2));
-
-    // Set push-pull and default speed
-    GPIOA->OTYPER &= ~((1 << PEDAL_OFF_LED_PIN) | (1 << PEDAL_ON_LED_PIN));
-
-
+    GPIOC->MODER |= (0b01 << (PEDAL_OFF_LED_PIN * 2));
+    GPIOC->MODER |= (0b01 << (PEDAL_ON_LED_PIN * 2));
+    GPIOC->MODER |= (0b01 << (PEDAL_HARD_DIST_LED_PIN * 2));
+    GPIOC->MODER |= (0b01 << (PEDAL_SOFT_DIST_LED_PIN * 2));
 
     //Determine whether the footswitch is on or off
     //This will determine whether or not to just pass the input to the output or to do the crunching
@@ -110,12 +115,11 @@ int main(void)
 
     if(bypassSwitchValue > 1.65f){
         //turn on the PA5 led and turn off pa4
-        GPIOA->ODR |= (1 << PEDAL_ON_LED_PIN);
-        GPIOA->ODR |= ~(1 << PEDAL_OFF_LED_PIN);
+        GPIOC->BSRR = (1 << PEDAL_ON_LED_PIN);
+        GPIOC->BSRR = (1 << PEDAL_OFF_LED_PIN + 16);
 
-        //Pedal is in the on position
-       
-          ip, because the higher the value, the lower the max amplitude is.
+
+        //Pedal is in the on position, because the higher the value, the lower the max amplitude is.
 
         // Map to output range
         inversedDistortionLevel = calc_mean(distortionDial,AUDIO_BLOCKSIZE);
@@ -144,6 +148,9 @@ int main(void)
         //volumeLevel = get_dial_value(volumeLevelPotentiometerPin, hadc1);
 
         if(distortionTypeValue > 1.65f){
+
+            GPIOC->BSRR = (1 << PEDAL_SOFT_DIST_LED_PIN);
+            GPIOC->BSRR = (1 << PEDAL_HARD_DIST_LED_PIN + 16);
             //If soft, run soft clipping code
             //Also logic to light up led at pin whatever to indicate soft clipping
             update_distortion_soft_clip(softFilt, inversedDistortionLevel);
@@ -153,6 +160,8 @@ int main(void)
             //calc_soft_clip( softFilt, input2, output2);
         }
         else{
+            GPIOC->BSRR = (1 << PEDAL_HARD_DIST_LED_PIN);
+            GPIOC->BSRR = (1 << PEDAL_SOFT_DIST_LED_PIN + 16);
             //If Hard, run hard clipping code
             //Also logic to light up led at pin whatever to indicate hard clipping
             update_distortion_hard_clip(hardFilt,inversedDistortionLevel);
@@ -172,8 +181,10 @@ int main(void)
         putblockstereo(output1, distortionDial);
     }
     else{
-        GPIOA->ODR |= ~(1 << PEDAL_ON_LED_PIN);  // Set PA5 high
-        GPIOA->ODR |= (1 << PEDAL_OFF_LED_PIN);  // Set PA4 low
+        GPIOC->BSRR = (1 <<  PEDAL_OFF_LED_PIN);
+        GPIOC->BSRR = (1 << PEDAL_ON_LED_PIN + 16);
+        GPIOC->BSRR = (1 << PEDAL_SOFT_DIST_LED_PIN + 16);
+        GPIOC->BSRR = (1 << PEDAL_HARD_DIST_LED_PIN + 16);
         putblockstereo(input1, distortionDial);
     }
   }  /// end of while(1)... time to go wait for the next block of input samples...
