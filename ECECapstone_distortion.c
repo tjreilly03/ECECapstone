@@ -116,7 +116,7 @@ int main(void)
     if(bypassSwitchValue > 1.65f){
         //turn on the PA5 led and turn off pa4
         GPIOC->BSRR = (1 << PEDAL_ON_LED_PIN);
-        GPIOC->BSRR = (1 << PEDAL_OFF_LED_PIN + 16);
+        GPIOC->BSRR = (1 << (PEDAL_OFF_LED_PIN + 16));
 
 
         //Pedal is in the on position, because the higher the value, the lower the max amplitude is.
@@ -150,7 +150,7 @@ int main(void)
         if(distortionTypeValue > 1.65f){
 
             GPIOC->BSRR = (1 << PEDAL_SOFT_DIST_LED_PIN);
-            GPIOC->BSRR = (1 << PEDAL_HARD_DIST_LED_PIN + 16);
+            GPIOC->BSRR = (1 << (PEDAL_HARD_DIST_LED_PIN + 16));
             //If soft, run soft clipping code
             //Also logic to light up led at pin whatever to indicate soft clipping
             update_distortion_soft_clip(softFilt, inversedDistortionLevel);
@@ -161,7 +161,7 @@ int main(void)
         }
         else{
             GPIOC->BSRR = (1 << PEDAL_HARD_DIST_LED_PIN);
-            GPIOC->BSRR = (1 << PEDAL_SOFT_DIST_LED_PIN + 16);
+            GPIOC->BSRR = (1 << (PEDAL_SOFT_DIST_LED_PIN + 16));
             //If Hard, run hard clipping code
             //Also logic to light up led at pin whatever to indicate hard clipping
             update_distortion_hard_clip(hardFilt,inversedDistortionLevel);
@@ -182,9 +182,9 @@ int main(void)
     }
     else{
         GPIOC->BSRR = (1 <<  PEDAL_OFF_LED_PIN);
-        GPIOC->BSRR = (1 << PEDAL_ON_LED_PIN + 16);
-        GPIOC->BSRR = (1 << PEDAL_SOFT_DIST_LED_PIN + 16);
-        GPIOC->BSRR = (1 << PEDAL_HARD_DIST_LED_PIN + 16);
+        GPIOC->BSRR = (1 << (PEDAL_ON_LED_PIN + 16));
+        GPIOC->BSRR = (1 << (PEDAL_SOFT_DIST_LED_PIN + 16));
+        GPIOC->BSRR = (1 << (PEDAL_HARD_DIST_LED_PIN + 16));
         putblockstereo(input1, distortionDial);
     }
   }  /// end of while(1)... time to go wait for the next block of input samples...
