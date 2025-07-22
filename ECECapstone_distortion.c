@@ -17,18 +17,20 @@ Distortion Pedal
 
 
 #define AUDIO_BLOCKSIZE 100
+
+//switch pins
 #define DISTORTION_TYPE_PIN 2
 #define BYPASS_TYPE_PIN 3
 
 
 //whatever pins I end up using, just update here!
-#define VOLUME_LOW_PIN 5
-#define VOLUME_MID_PIN 6
-#define VOLUME_HI_PIN 7
+#define VOLUME_LOW_PIN 4
+#define VOLUME_MID_PIN 5
+#define VOLUME_HI_PIN 6
 
-#define VOLUME_LOW_LED_PIN 8
-#define VOLUME_MID_LED_PIN 9
-#define VOLUME_HI_LED_PIN 13
+#define VOLUME_LOW_LED_PIN 7
+#define VOLUME_MID_LED_PIN 8
+#define VOLUME_HI_LED_PIN 9
 
 
 #define PEDAL_ON_LED_PIN 10
