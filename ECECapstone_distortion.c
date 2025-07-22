@@ -19,6 +19,11 @@ Distortion Pedal
 #define AUDIO_BLOCKSIZE 100
 #define DISTORTION_TYPE_PIN 2
 #define BYPASS_TYPE_PIN 3
+
+#define VOLUME_LOW_PIN 5
+#define VOLUME_MID_PIN 6
+#define VOLUME_HI_PIN 7
+
 #define PEDAL_ON_LED_PIN 10
 #define PEDAL_OFF_LED_PIN 12
 
@@ -39,6 +44,7 @@ int main(void)
 {
     //Initialize all variables being used
   int nblocksize;
+  float amplificationLevel = 1.0f;
   float *input1, *output1, *distortionDial;
 
   float distortionLevel = 0.0f;
@@ -96,6 +102,19 @@ int main(void)
 
 	GPIOC->PUPDR &= ~(3<<(2*BYPASS_TYPE_PIN)); //No Pull up no pull down
 
+    //hi med low volume button pins
+    GPIOC->MODER &= ~(3 << (2 * VOLUME_HI_PIN)); // Input (00)
+
+    GPIOC->PUPDR &= ~(3 << (2 * VOLUME_HI_PIN)); //No Pull up no pull down
+
+    GPIOC->MODER &= ~(3 << (2 * VOLUME_MID_PIN)); // Input (00)
+
+    GPIOC->PUPDR &= ~(3 << (2 * VOLUME_MID_PIN)); //No Pull up no pull down
+
+    GPIOC->MODER &= ~(3 << (2 * VOLUME_LOW_PIN)); // Input (00)
+
+    GPIOC->PUPDR &= ~(3 << (2 * VOLUME_LOW_PIN)); //No Pull up no pull down
+
     // Clear mode bits
     GPIOC->MODER &= ~(0b11 << (PEDAL_OFF_LED_PIN * 2));
     GPIOC->MODER &= ~(0b11 << (PEDAL_ON_LED_PIN * 2));
@@ -112,6 +131,20 @@ int main(void)
     //Determine whether the footswitch is on or off
     //This will determine whether or not to just pass the input to the output or to do the crunching
     bypassSwitchValue = get_switch_value(BYPASS_TYPE_PIN);
+    
+    //read the values of the high med low buttons to see which one is high. prioritize high, then med, then low
+    if (get_switch_value(VOLUME_HI_PIN) > 1.65f) {
+        amplificationLevel = 1.2f;
+    }
+    else if (get_switch_value(VOLUME_MID_PIN) > 1.65f) {
+        amplificationLevel = 0.8f;
+    }
+    else if (get_switch_value(VOLUME_LOW_PIN) > 1.65f) {
+        amplificationLevel = 0.4f;
+    }
+    else {
+        amplificationLevel = 1.0f;
+    }
 
     if(bypassSwitchValue > 1.65f){
         //turn on the PA5 led and turn off pa4
@@ -154,7 +187,7 @@ int main(void)
             //If soft, run soft clipping code
             //Also logic to light up led at pin whatever to indicate soft clipping
             update_distortion_soft_clip(softFilt, inversedDistortionLevel);
-            //update_volume_soft_clip(softFilt, 2.5f);
+            update_volume_soft_clip(softFilt, amplificationLevel);
             calc_soft_clip( softFilt, input1, output1);
             //I guess if it's stereo,
             //calc_soft_clip( softFilt, input2, output2);
@@ -165,15 +198,13 @@ int main(void)
             //If Hard, run hard clipping code
             //Also logic to light up led at pin whatever to indicate hard clipping
             update_distortion_hard_clip(hardFilt,inversedDistortionLevel);
-            //update_volume_hard_clip(hardFilt, 2.5f);
+            update_volume_hard_clip(hardFilt, amplificationLevel);
             calc_hard_clip( hardFilt, input1, output1);
             //I guess if it's stereo,
             //calc_hard_clip( hardFilt, input2, output2);
         }
         //then have to do some sort of overall amplitude based on s->volumeLevel to the outputs, either way. This saves some lines of code in each calc function.
         //Why define the same thing twice when you can just define it once.
-        
-        //Send out the final output
 
         PA6_RESET();  // (falling edge on PA6: Done processing data )
     

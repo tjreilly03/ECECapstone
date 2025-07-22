@@ -56,6 +56,8 @@ void calc_hard_clip( HARD_CLIP_T *s, float *x_in, float *y_out)
 		else {
 			y_out[i] = x_in[i];
 		}
+
+		y_out[i] = y_out[i] * s->volumeLevel;
 		
 	}
 }
