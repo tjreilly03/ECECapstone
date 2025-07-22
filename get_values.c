@@ -1,12 +1,11 @@
 /*!
  * @file
- * 
- * @brief Running Mean Filter Implementation
- * 
- * @author ECE486 Lab Group 12
- * @author Tyler Reilly, Joshua Deveau, Basel Alsarraf
- * 
- * @date Feb 2024
+ *
+ * @brief Getting and Setting functions, for leds and switches
+ *
+ * @author Tyler Reilly
+ *
+ * @date May 2025
  */
 
 #include <stdlib.h>
@@ -33,14 +32,8 @@ float get_switch_value(
 )
 {
 	//Get voltage value for that switch at pin pin_number
-	//Use gpio pin
 	float switch_state = 0.0f;
-	if(pin_number == 3){
-		switch_state = (GPIOC->IDR & 1<<3) == 0 ? 3.3f : 0.0f;
-	}
-	else if(pin_number == 2){
-		switch_state = (GPIOC->IDR & 1<<2) == 0 ? 3.3f : 0.0f;
-	}
+	switch_state = (GPIOC->IDR & 1<< pin_number) == 0 ? 3.3f : 0.0f;
   return(switch_state);
 }
 
@@ -49,16 +42,14 @@ void set_led_on_value(
 	int pin_number
 ){
 
-//Set the desired led on
-//Use gpio pin to turn voltage high to 3.3v
+	GPIOC->BSRR = (1 << pin_number);
 }
 
 void set_led_off_value(
 	//Needs some variable for what switch pin to use
 	int pin_number
 ){
-
-//Set the desired led off
-//Use gpio pin to turn voltage low to gnd
+	//not sure if this will work or if I will use? whats happening now is working, don't want to make it mad
+	GPIOC->BSRR = (1 << (pin_number + 16));
 }
 

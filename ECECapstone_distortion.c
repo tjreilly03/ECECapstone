@@ -88,7 +88,6 @@ int main(void)
   //These are 32 bit floats, single precision, meaning they have 24 bit resolution, meeting spec.
   input1 = (float *)malloc(sizeof(float)*nblocksize);
   distortionDial = (float *)malloc(sizeof(float)*nblocksize);
-  //dial2 = (float *)malloc(sizeof(float)*nblocksize);
 
   output1 = (float *)malloc(sizeof(float)*nblocksize);
 
@@ -142,6 +141,7 @@ int main(void)
     //read the values of the high med low buttons to see which one is high. prioritize high, then med, then low
     if (get_switch_value(VOLUME_HI_PIN) > 1.65f) {
         amplificationLevel = 1.2f;
+        //turn on the assocated led
         GPIOC->BSRR = (1 << VOLUME_HI_LED_PIN);
         GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
         GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
@@ -149,6 +149,7 @@ int main(void)
     }
     else if (get_switch_value(VOLUME_MID_PIN) > 1.65f) {
         amplificationLevel = 0.8f;
+        //turn on the assocated led
         GPIOC->BSRR = (1 << VOLUME_MID_LED_PIN);
         GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
         GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
@@ -156,6 +157,7 @@ int main(void)
     }
     else if (get_switch_value(VOLUME_LOW_PIN) > 1.65f) {
         amplificationLevel = 0.4f;
+        //turn on the assocated led
         GPIOC->BSRR = (1 << VOLUME_LOW_LED_PIN);
         GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
         GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));

@@ -1,12 +1,11 @@
 /*!
  * @file
- * 
- * @brief Running Mean Filter Implementation
- * 
- * @author ECE486 Lab Group 12
- * @author Tyler Reilly, Joshua Deveau, Basel Alsarraf
- * 
- * @date Feb 2024
+ *
+ * @brief Soft clipping functions
+ *
+ * @author Tyler Reilly
+ *
+ * @date May 2025
  */
 
 #include <stdlib.h>
