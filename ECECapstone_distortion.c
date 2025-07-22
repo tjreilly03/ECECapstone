@@ -20,9 +20,16 @@ Distortion Pedal
 #define DISTORTION_TYPE_PIN 2
 #define BYPASS_TYPE_PIN 3
 
+
+//whatever pins I end up using, just update here!
 #define VOLUME_LOW_PIN 5
 #define VOLUME_MID_PIN 6
 #define VOLUME_HI_PIN 7
+
+#define VOLUME_LOW_LED_PIN 8
+#define VOLUME_MID_LED_PIN 9
+#define VOLUME_HI_LED_PIN 13
+
 
 #define PEDAL_ON_LED_PIN 10
 #define PEDAL_OFF_LED_PIN 12
@@ -135,15 +142,23 @@ int main(void)
     //read the values of the high med low buttons to see which one is high. prioritize high, then med, then low
     if (get_switch_value(VOLUME_HI_PIN) > 1.65f) {
         amplificationLevel = 1.2f;
+        GPIOC->BSRR = (1 << VOLUME_HI_LED_PIN);
+        GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
+        GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
+
     }
     else if (get_switch_value(VOLUME_MID_PIN) > 1.65f) {
         amplificationLevel = 0.8f;
+        GPIOC->BSRR = (1 << VOLUME_MID_LED_PIN);
+        GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
+        GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
+
     }
     else if (get_switch_value(VOLUME_LOW_PIN) > 1.65f) {
         amplificationLevel = 0.4f;
-    }
-    else {
-        amplificationLevel = 1.0f;
+        GPIOC->BSRR = (1 << VOLUME_LOW_LED_PIN);
+        GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
+        GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
     }
 
     if(bypassSwitchValue > 1.65f){
