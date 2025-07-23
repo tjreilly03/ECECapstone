@@ -53,7 +53,8 @@ int main(void)
 {
     //Initialize all variables being used
   int nblocksize;
-  float amplificationLevel = 1.0f;
+  float amplificationLevel = 0.8f;
+  int firstRun = 1;
   float *input1, *output1, *distortionDial;
 
   float distortionLevel = 0.0f;
@@ -141,25 +142,48 @@ int main(void)
     bypassSwitchValue = get_switch_value(BYPASS_TYPE_PIN);
     
     //read the values of the high med low buttons to see which one is high. prioritize high, then med, then low
-    if (get_switch_value(VOLUME_HI_PIN) > 1.65f) {
+
+
+    printf("PRE BUTTON LOGIC!!!!! \n");
+    float high = get_switch_value(VOLUME_HI_PIN);
+    float mid = get_switch_value(VOLUME_MID_PIN);
+    float low = get_switch_value(VOLUME_LOW_PIN);
+    printf("high value %f!!!! \n", high);
+    printf("mid value %f!!!! \n", mid);
+    printf("low value %f!!!! \n", low);
+
+
+        
+    
+    if (get_switch_value(VOLUME_HI_PIN) < 1.00f) {
         amplificationLevel = 1.2f;
+        firstRun = 0;
         //turn on the assocated led
+
+        printf("HIGH!!!! \n");
+
         GPIOC->BSRR = (1 << VOLUME_HI_LED_PIN);
         GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
         GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
 
     }
-    else if (get_switch_value(VOLUME_MID_PIN) > 1.65f) {
+    else if (get_switch_value(VOLUME_MID_PIN) < 1.00f || firstRun == 1) {
         amplificationLevel = 0.8f;
+        firstRun = 0;
         //turn on the assocated led
+        printf("MID!!!! \n");
+
         GPIOC->BSRR = (1 << VOLUME_MID_LED_PIN);
         GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
         GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
 
     }
-    else if (get_switch_value(VOLUME_LOW_PIN) > 1.65f) {
+    else if (get_switch_value(VOLUME_LOW_PIN) < 1.00f) {
         amplificationLevel = 0.4f;
+        firstRun = 0;
         //turn on the assocated led
+        printf("LOW!!!! \n");
+
         GPIOC->BSRR = (1 << VOLUME_LOW_LED_PIN);
         GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
         GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
