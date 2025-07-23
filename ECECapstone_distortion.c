@@ -28,9 +28,9 @@ Distortion Pedal
 #define VOLUME_MID_PIN 5
 #define VOLUME_HI_PIN 6
 
-#define VOLUME_LOW_LED_PIN 7
-#define VOLUME_MID_LED_PIN 8
-#define VOLUME_HI_LED_PIN 9
+#define VOLUME_LOW_LED_PIN 13
+#define VOLUME_MID_LED_PIN 14
+#define VOLUME_HI_LED_PIN 15
 
 
 #define PEDAL_ON_LED_PIN 10
@@ -54,7 +54,6 @@ int main(void)
     //Initialize all variables being used
   int nblocksize;
   float amplificationLevel = 0.8f;
-  int firstRun = 1;
   float *input1, *output1, *distortionDial;
 
   float distortionLevel = 0.0f;
@@ -105,7 +104,7 @@ int main(void)
 
     PA6_SET(); //Start of processing time
 
-    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN |  RCC_AHB2ENR_GPIOBEN  ;
 	
 	GPIOC->MODER &= ~(3<<(2*BYPASS_TYPE_PIN)); // Input (00)
 
@@ -131,11 +130,21 @@ int main(void)
     GPIOC->MODER &= ~(0b11 << (PEDAL_HARD_DIST_LED_PIN * 2));
     GPIOC->MODER &= ~(0b11 << (PEDAL_SOFT_DIST_LED_PIN * 2));
 
+    //volume leds
+    GPIOB->MODER &= ~(0b11 << (VOLUME_HI_LED_PIN * 2));
+    GPIOB->MODER &= ~(0b11 << (VOLUME_MID_LED_PIN * 2));
+    GPIOB->MODER &= ~(0b11 << (VOLUME_LOW_LED_PIN * 2));
+
     // Set both to output mode
     GPIOC->MODER |= (0b01 << (PEDAL_OFF_LED_PIN * 2));
     GPIOC->MODER |= (0b01 << (PEDAL_ON_LED_PIN * 2));
     GPIOC->MODER |= (0b01 << (PEDAL_HARD_DIST_LED_PIN * 2));
     GPIOC->MODER |= (0b01 << (PEDAL_SOFT_DIST_LED_PIN * 2));
+
+    //volume leds
+    GPIOB->MODER |= (0b01 << (VOLUME_HI_LED_PIN * 2));
+    GPIOB->MODER |= (0b01 << (VOLUME_MID_LED_PIN * 2));
+    GPIOB->MODER |= (0b01 << (VOLUME_LOW_LED_PIN * 2));
 
     //Determine whether the footswitch is on or off
     //This will determine whether or not to just pass the input to the output or to do the crunching
@@ -143,50 +152,30 @@ int main(void)
     
     //read the values of the high med low buttons to see which one is high. prioritize high, then med, then low
 
-
-    printf("PRE BUTTON LOGIC!!!!! \n");
-    float high = get_switch_value(VOLUME_HI_PIN);
-    float mid = get_switch_value(VOLUME_MID_PIN);
-    float low = get_switch_value(VOLUME_LOW_PIN);
-    printf("high value %f!!!! \n", high);
-    printf("mid value %f!!!! \n", mid);
-    printf("low value %f!!!! \n", low);
-
-
-        
-    
     if (get_switch_value(VOLUME_HI_PIN) < 1.00f) {
         amplificationLevel = 1.2f;
-        firstRun = 0;
-        //turn on the assocated led
-
-        printf("HIGH!!!! \n");
-
-        GPIOC->BSRR = (1 << VOLUME_HI_LED_PIN);
-        GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
-        GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
-
     }
-    else if (get_switch_value(VOLUME_MID_PIN) < 1.00f || firstRun == 1) {
+    else if (get_switch_value(VOLUME_MID_PIN) < 1.00f) {
         amplificationLevel = 0.8f;
-        firstRun = 0;
-        //turn on the assocated led
-        printf("MID!!!! \n");
-
-        GPIOC->BSRR = (1 << VOLUME_MID_LED_PIN);
-        GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
-        GPIOC->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
-
     }
     else if (get_switch_value(VOLUME_LOW_PIN) < 1.00f) {
         amplificationLevel = 0.4f;
-        firstRun = 0;
-        //turn on the assocated led
-        printf("LOW!!!! \n");
-
-        GPIOC->BSRR = (1 << VOLUME_LOW_LED_PIN);
-        GPIOC->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
-        GPIOC->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
+    }
+    //turning on leds
+    if (amplificationLevel == 1.2f) {
+        GPIOB->BSRR = (1 << VOLUME_HI_LED_PIN);
+        GPIOB->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
+        GPIOB->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
+    }
+    else if (amplificationLevel == 0.8f) {
+        GPIOB->BSRR = (1 << VOLUME_MID_LED_PIN);
+        GPIOB->BSRR = (1 << (VOLUME_LOW_LED_PIN + 16));
+        GPIOB->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
+    }
+    else if (amplificationLevel == 0.4f) {
+        GPIOB->BSRR = (1 << VOLUME_LOW_LED_PIN);
+        GPIOB->BSRR = (1 << (VOLUME_MID_LED_PIN + 16));
+        GPIOB->BSRR = (1 << (VOLUME_HI_LED_PIN + 16));
     }
 
     if(bypassSwitchValue > 1.65f){
