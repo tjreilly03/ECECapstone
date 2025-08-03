@@ -53,7 +53,7 @@ int main(void)
 {
     //Initialize all variables being used
   int nblocksize;
-  float amplificationLevel = 0.8f;
+  float amplificationLevel = 0.8f; 
   float *input1, *output1, *distortionDial;
 
   float distortionLevel = 0.0f;
